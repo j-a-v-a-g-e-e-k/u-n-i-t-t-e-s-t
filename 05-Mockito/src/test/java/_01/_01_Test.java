@@ -28,28 +28,42 @@ public class _01_Test {
 
 	// gets called right before the invocation of each test method
 	@Before 
-	public void setup(){
-		
+	public void setup(){		
 		//ARRANGE
 		DAOMock = mock(IDao.class); 
 		classUnderTest = new ServiceImpl(DAOMock);
 	}
 
 	@Test(expected=DAONotAvailableException.class)
-	public void question_WhenDAOIsNotAvailable_ThrowDAONotAvailableException() throws InvalidQuestionException, DAONotAvailableException{
-		
+	public void question_WhenDAOIsNotAvailable_ThrowDAONotAvailableException() throws InvalidQuestionException, DAONotAvailableException{		
+		// ARRANGE: SETUP MOCK EXPECTATION
+		when(DAOMock.greet()).thenReturn(null); 		
+		//ACT
+		classUnderTest.question("any question"); 		
+		//ASSERT is done above. Also we cannot check if certain methods were called or not after an exception is thrown.
+	}
+	
+	// if you catch the exception, then you can further verify other things.
+	@Test
+	public void question_WhenDAOIsNotAvailable_ThrowDAONotAvailableException2() throws InvalidQuestionException, DAONotAvailableException{
 		// ARRANGE: SETUP MOCK EXPECTATION
 		when(DAOMock.greet()).thenReturn(null); 
-		
 		//ACT
-		classUnderTest.question("any question"); 
-		
-		//ASSERT is done above. Also we cannot check if certain methods were called or not after an exception is thrown.
+		try{
+			classUnderTest.question("any question");
+			Assert.fail("I should not be reached");
+		} catch(Exception ex){
+			Assert.assertEquals(ex.getClass(), DAONotAvailableException.class);
+		}
+		//ASSERT
+		verify(DAOMock, never()).question(IDao.ANY_NEW_TOPICS);
+		verify(DAOMock, never()).question(IDao.WHAT_IS_TODAYS_TOPIC);
+		verify(DAOMock, never()).getPrice(IDao.TOPIC_MOCKITO);
+		verify(DAOMock, never()).bye();
 	}
 
 	@Test(expected=InvalidQuestionException.class)
-	public void question_WhenInvalidQuestionIsAsked_ThrowInvalidQuestionException() throws InvalidQuestionException, DAONotAvailableException{
-		
+	public void question_WhenInvalidQuestionIsAsked_ThrowInvalidQuestionException() throws InvalidQuestionException, DAONotAvailableException{		
 		// ARRANGE: SETUP MOCK EXPECTATION
 		when(DAOMock.greet()).thenReturn(IDao.HELLO_WORLD); 
 		// can be done in either way shown below
@@ -66,22 +80,18 @@ public class _01_Test {
 			public boolean matches(Object argument) {
 				return !IDao.ANY_NEW_TOPICS.equals(argument) || !IDao.WHAT_IS_TODAYS_TOPIC.equals(argument);
 			}			
-		}))).thenThrow(new InvalidQuestionException());
-		
+		}))).thenThrow(new InvalidQuestionException());		
 		//ACT
 		classUnderTest.question("INVALID_QUESTION");
 	}
 
 	@Test
-	public void question_WhenNoNewTopicIsAvailable() throws InvalidQuestionException, DAONotAvailableException{
-		
+	public void question_WhenNoNewTopicIsAvailable() throws InvalidQuestionException, DAONotAvailableException{		
 		// ARRANGE: SETUP MOCK EXPECTATION
 		when(DAOMock.greet()).thenReturn(IDao.HELLO_WORLD); 
-		when(DAOMock.question(IDao.ANY_NEW_TOPICS)).thenReturn(IDao.NO_NEW_TOPIC);
-		
+		when(DAOMock.question(IDao.ANY_NEW_TOPICS)).thenReturn(IDao.NO_NEW_TOPIC);		
 		//ACT
-		String result = classUnderTest.question(IDao.ANY_NEW_TOPICS);		
-		
+		String result = classUnderTest.question(IDao.ANY_NEW_TOPICS);				
 		//ASSERT
 		// state verification
 		Assert.assertEquals(result, IDao.NO_NEW_TOPIC); 
@@ -98,11 +108,9 @@ public class _01_Test {
 		when(DAOMock.greet()).thenReturn(IDao.HELLO_WORLD); 
 		when(DAOMock.question(IDao.ANY_NEW_TOPICS)).thenReturn(IDao.YES_NEW_TOPICS_AVAILABLE);
 		when(DAOMock.question(IDao.WHAT_IS_TODAYS_TOPIC)).thenReturn(IDao.TOPIC_MOCKITO);
-		when(DAOMock.getPrice(IDao.TOPIC_MOCKITO)).thenReturn(99);
-		
+		when(DAOMock.getPrice(IDao.TOPIC_MOCKITO)).thenReturn(99);		
 		//ACT
-		String result = classUnderTest.question(IDao.ANY_NEW_TOPICS);
-		
+		String result = classUnderTest.question(IDao.ANY_NEW_TOPICS);		
 		//ASSERT
 		Assert.assertEquals(result, "Topic is Mockito, price is 99");
 		verify(DAOMock, times(1)).question(IDao.ANY_NEW_TOPICS);

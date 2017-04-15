@@ -1,3 +1,14 @@
+/*
+For void methods, we cannot use when().thenReturn() or when().thenThrow().
+We can stub a void method to throw an exception using doThrow(). Other than that we can also make use of doNothing(), doAnswer() or doReturn() APIs.
+
+Stub void method Using doAnswer
+Suppose we want to custom behavior a method’s behavior based on the arguments passed then we can use doAnswer() API.
+Answer interface specifies an action that is executed when you interact with the mock’s method. We can customize the behavior based on the mock’s method 
+name or the method arguments which is passed to it. In case of non-void methods, you can even make the answer to customize the method’s return value.
+
+ */
+
 package _01;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,6 +36,7 @@ public class _02_Test {
 	public void eat_doNothing() throws WrongDishException, NotSuchATastyException{
 		Mockito.doNothing().when(dishMock).eat("any spice level");
 		classUnderTest.eat("any spice level");
+		System.out.println("Finished the dish, no exception thrown");
 	}
 
 	@Test(expected=WrongDishException.class)
@@ -61,10 +73,13 @@ public class _02_Test {
 		}		
 	}
 
+	// Stub void method with consecutive calls
 	@Test
 	public void eatMultipleDishes() throws WrongDishException, NotSuchATastyException {
 		System.out.println("Train dish to not throw NotSoTastyException when called first time and return in subsequent calls");
-		Mockito.doThrow(NotSuchATastyException.class).doNothing().when(dishMock).eat("medium");
+		Mockito.doThrow(NotSuchATastyException.class)
+			.doNothing()
+			.when(dishMock).eat("medium");
 		try {
 			classUnderTest.eat("medium");
 			System.out.println("I should not be printed");
