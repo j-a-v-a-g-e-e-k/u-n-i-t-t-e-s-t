@@ -1,4 +1,4 @@
-package _01;
+package _01_HelloWorld;
 
 public class InvalidQuestionException extends Exception {
 

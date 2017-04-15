@@ -1,4 +1,4 @@
-package _02;
+package _02_VoidMethod;
 
 public class NotSuchATastyException extends Exception {
 

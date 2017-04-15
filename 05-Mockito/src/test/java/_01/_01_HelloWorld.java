@@ -12,14 +12,14 @@ import org.mockito.ArgumentMatcher;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
-import _01.DAONotAvailableException;
-import _01.IDao;
-import _01.InvalidQuestionException;
-import _01.ServiceImpl;
+import _01_HelloWorld.DAONotAvailableException;
+import _01_HelloWorld.IDao;
+import _01_HelloWorld.InvalidQuestionException;
+import _01_HelloWorld.ServiceImpl;
 import junit.framework.Assert;
 
 @SuppressWarnings({ "unchecked", "deprecation" })
-public class _01_Test {
+public class _01_HelloWorld {
 	//For this test ServiceImpl is also called System Under Test(SUT)
 	private ServiceImpl classUnderTest;
 	// using @Mock is not working
@@ -124,7 +124,7 @@ public class _01_Test {
 	public void question_WhenNewTopicIsAvailable2() throws InvalidQuestionException, DAONotAvailableException{
 		// ARRANGE: SETUP MOCK EXPECTATION
 		when(DAOMock.greet()).thenReturn(IDao.HELLO_WORLD); 		
-		//when it needs to return different values for different arguments, Mockito’s argument matcher is handy 
+		//when it needs to return different values for different arguments, Mockitoï¿½s argument matcher is handy 
 		when(DAOMock.question((String) argThat(new ArgumentMatcher<Object>(){
 			@Override
 			public boolean matches(Object argument) {
