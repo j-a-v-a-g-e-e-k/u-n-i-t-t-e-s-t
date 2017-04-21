@@ -6,9 +6,11 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentMatcher;
+import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
@@ -16,13 +18,11 @@ import _01_HelloWorld.DAONotAvailableException;
 import _01_HelloWorld.IDao;
 import _01_HelloWorld.InvalidQuestionException;
 import _01_HelloWorld.ServiceImpl;
-import junit.framework.Assert;
 
 @SuppressWarnings({ "unchecked", "deprecation" })
 public class _01_HelloWorld {
 	//For this test ServiceImpl is also called System Under Test(SUT)
 	private ServiceImpl classUnderTest;
-	// using @Mock is not working
 	//For this test IDao is also called collaborator
 	private IDao DAOMock;
 
@@ -40,7 +40,7 @@ public class _01_HelloWorld {
 		when(DAOMock.greet()).thenReturn(null); 		
 		//ACT
 		classUnderTest.question("any question"); 		
-		//ASSERT is done above. Also we cannot check if certain methods were called or not after an exception is thrown.
+		//ASSERT is done above. Also with this approach, we cannot check if certain methods were called or not after an exception is thrown.
 	}
 	
 	// if you catch the exception, then you can further verify other things.
@@ -67,12 +67,13 @@ public class _01_HelloWorld {
 		// ARRANGE: SETUP MOCK EXPECTATION
 		when(DAOMock.greet()).thenReturn(IDao.HELLO_WORLD); 
 		// can be done in either way shown below
+//		when(DAOMock.question(Mockito.anyString())).thenThrow(new InvalidQuestionException());
 //		when(DAOMock.question("INVALID_QUESTION")).thenThrow(new InvalidQuestionException());
 		// argThat: Allows creating custom argument matchers
 		// The API follows builder pattern where each method returns us an Object of type OngoingStubbing so that we can stub further on the returned 
 		// object thus allowing us to build the expectations fluently.
 		// instead of testing the code against one invalid value, it now tests on a sub-set of values using the ArgumentMatcher. We pass in a 
-		// org.mockito.ArgumentMatcher object to argThat(), so that the argument passed in to foo.questionStrictly() can be tested against the matcher 
+		// org.mockito.ArgumentMatcher object to argThat(), so that the argument passed in to DAOMock.question() can be tested against the matcher 
 		// to know whether it is one of the arguments expected by the mock object. If yes, then the next stub action will follow, in our case, the 
 		// method will throw an InvalidQuestionException, if the argument value is not a valid question.
 		when(DAOMock.question((String) argThat(new ArgumentMatcher<Object>() {

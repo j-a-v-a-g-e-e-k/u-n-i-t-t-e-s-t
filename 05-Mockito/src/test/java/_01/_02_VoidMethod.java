@@ -1,6 +1,6 @@
 /*
 For void methods, we cannot use when().thenReturn() or when().thenThrow().
-We can stub a void method to throw an exception using doThrow(). Other than that we can also make use of doNothing(), doAnswer() or doReturn() APIs.
+We can stub a void method to throw an exception using doThrow(). Other than that we can also make use of doNothing() or doAnswer() APIs.
 
 Stub void method Using doAnswer
 Suppose we want to custom behavior a method�s behavior based on the arguments passed then we can use doAnswer() API.
@@ -10,6 +10,7 @@ name or the method arguments which is passed to it. In case of non-void methods,
  */
 
 package _01;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -20,7 +21,7 @@ import _02_VoidMethod.Customer;
 import _02_VoidMethod.Dish;
 import _02_VoidMethod.NotSuchATastyException;
 import _02_VoidMethod.WrongDishException;
-import junit.framework.Assert;
+
 
 public class _02_VoidMethod {
 	private Customer classUnderTest;
@@ -62,14 +63,14 @@ public class _02_VoidMethod {
 		classUnderTest.eat(spicy);
 	}
 
-	private class SpiceAnswer implements Answer {
+	private class SpiceAnswer implements Answer<Void> {
 		@Override
-		public String answer(InvocationOnMock invocation) throws Throwable {
+		public Void answer(InvocationOnMock invocation) throws Throwable {
 			String arg = (String) invocation.getArguments()[0];
-			if ("too spicy".equals(arg)) {
+			if ("too spicy".equals(arg) || "extra spicy".equals(arg)) {
 				throw new RuntimeException("Spicy dish!");
 			}
-			return arg;
+			return null;
 		}		
 	}
 
@@ -78,19 +79,23 @@ public class _02_VoidMethod {
 	public void eatMultipleDishes() throws WrongDishException, NotSuchATastyException {
 		System.out.println("Train dish to not throw NotSoTastyException when called first time and return in subsequent calls");
 		Mockito.doThrow(NotSuchATastyException.class)
-			.doNothing()
-			.when(dishMock).eat("medium");
+		.doNothing()
+		.doAnswer(new SpiceAnswer())
+		.when(dishMock).eat("extra spicy");
 		try {
-			classUnderTest.eat("medium");
+			classUnderTest.eat("extra spicy");
 			System.out.println("I should not be printed");
 			Assert.fail("allows eating, should have failed with NotSoTastyException");
 		} catch(NotSuchATastyException e) {
 			System.out.println("Coudln't eat the dish, not very tasty");
 		}
-		classUnderTest.eat("medium");
+		classUnderTest.eat("extra spicy");
 		System.out.println("Finished the dish, no exception thrown");
-		classUnderTest.eat("medium");
-		System.out.println("Finished the dish, no exception thrown");		
+		try{
+			classUnderTest.eat("extra spicy");	
+		}catch(RuntimeException ex){
+			Assert.assertEquals(ex.getClass(), RuntimeException.class);
+		}
 	}
 
 }
