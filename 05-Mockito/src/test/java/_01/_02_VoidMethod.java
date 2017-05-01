@@ -1,12 +1,15 @@
 /*
+============
+VOID METHODS
+============
 For void methods, we cannot use when().thenReturn() or when().thenThrow().
 We can stub a void method to throw an exception using doThrow(). Other than that we can also make use of doNothing() or doAnswer() APIs.
 
 Stub void method Using doAnswer
-Suppose we want to custom behavior a method�s behavior based on the arguments passed then we can use doAnswer() API.
-Answer interface specifies an action that is executed when you interact with the mock�s method. We can customize the behavior based on the mock�s method 
-name or the method arguments which is passed to it. In case of non-void methods, you can even make the answer to customize the method�s return value.
-
+Suppose we want to custom behavior a method's behavior based on the arguments passed then we can use doAnswer() API.
+Answer interface specifies an action that is executed when you interact with the mock�s method. We can customize the behavior based on the mockito's 
+method name or the method arguments which is passed to it. In case of non-void methods, you can even make the answer to customize the method's return 
+value.
  */
 
 package _01;
@@ -77,17 +80,15 @@ public class _02_VoidMethod {
 	// Stub void method with consecutive calls
 	@Test
 	public void eatMultipleDishes() throws WrongDishException, NotSuchATastyException {
-		System.out.println("Train dish to not throw NotSoTastyException when called first time and return in subsequent calls");
 		Mockito.doThrow(NotSuchATastyException.class)
 		.doNothing()
 		.doAnswer(new SpiceAnswer())
 		.when(dishMock).eat("extra spicy");
 		try {
 			classUnderTest.eat("extra spicy");
-			System.out.println("I should not be printed");
-			Assert.fail("allows eating, should have failed with NotSoTastyException");
-		} catch(NotSuchATastyException e) {
-			System.out.println("Coudln't eat the dish, not very tasty");
+			Assert.fail("I should not be reached");
+		} catch(NotSuchATastyException ex) {
+			Assert.assertEquals(ex.getClass(), NotSuchATastyException.class);;
 		}
 		classUnderTest.eat("extra spicy");
 		System.out.println("Finished the dish, no exception thrown");

@@ -12,9 +12,20 @@ We will use PowerMockito.mockStatic statement which takes in the class to be moc
 
 This class should be annotated with @RunWith(PowerMockRunner.class) annotation. When a class is annotated with @RunWith or extends a class annotated with @RunWith, JUnit will invoke the class it references to run the tests in that class instead of the runner built into JUnit.
 
-We need another class level annotation for this example: @PrepareForTest. This annotation tells PowerMock to prepare certain classes for testing. Classes needed to be defined using this annotation are typically those that needs to be byte-code manipulated. This includes final classes, classes with final, private, static or native methods that should be mocked and also classes that should be return a mock object upon instantiation.
-This annotation can be placed at both test classes and individual test methods. If placed on a class all test methods in this test class will be handled by PowerMock (to allow for testability). To override this behavior for a single method just place a @PrepareForTest annotation on the specific test method. This is useful in situations where for example you’d like to modify class X in test method A but in test method B you want X to be left intact. In situations like this you place a @PrepareForTest on method B and exclude class X from the list.
-Sometimes you need to prepare inner classes for testing, this can be done by suppling the fully-qualified name of the inner-class that should be mocked to the list. You can also prepare whole packages for test by using wildcards. The annotation should always be combined with the @RunWith(PowerMockRunner.class) if using junit 4.x. The difference between this annotation and the @PrepareOnlyThisForTest annotation is that this annotation modifies the specified classes and all its super classes whereas the @PrepareOnlyThisForTest annotation manipulates only the specified classes.
+We need another class level annotation for this example: @PrepareForTest. This annotation tells PowerMock to prepare certain classes for testing. 
+Classes needed to be defined using this annotation are typically those that needs to be byte-code manipulated. This includes final classes, classes 
+with final, private, static or native methods that should be mocked and also classes that should be return a mock object upon instantiation.
+
+This annotation can be placed at both test classes and individual test methods. If placed on a class all test methods in this test class will be handled 
+by PowerMock (to allow for testability). To override this behavior for a single method just place a @PrepareForTest annotation on the specific test 
+method. This is useful in situations where for example you’d like to modify class X in test method A but in test method B you want X to be left intact. 
+In situations like this you place a @PrepareForTest on method B and exclude class X from the list.
+
+Sometimes you need to prepare inner classes for testing, this can be done by suppling the fully-qualified name of the inner-class that should be mocked 
+to the list. You can also prepare whole packages for test by using wildcards. The annotation should always be combined with the 
+@RunWith(PowerMockRunner.class) if using junit 4.x. The difference between this annotation and the @PrepareOnlyThisForTest annotation is that this 
+annotation modifies the specified classes and all its super classes whereas the @PrepareOnlyThisForTest annotation manipulates only the specified 
+classes.
 
 
  */

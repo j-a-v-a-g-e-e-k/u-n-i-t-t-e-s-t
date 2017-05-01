@@ -1,3 +1,16 @@
+/*
+argThat: Allows creating custom argument matchers		
+
+Instead of testing the code against one invalid value, it now tests on a sub-set of values using the ArgumentMatcher. We pass in a 
+org.mockito.ArgumentMatcher object to argThat(), so that the argument passed in to DAOMock.question() can be tested against the matcher to know whether 
+it is one of the arguments expected by the mock object. If yes, then the next stub action will follow, in our case, the method will throw an 
+InvalidQuestionException, if the argument value is not a valid question.
+When it needs to return different values for different arguments, Mockito's argument matcher is handy 
+
+The API follows builder pattern where each method returns us an Object of type OngoingStubbing so that we can stub further on the returned object thus 
+allowing us to build the expectations fluently.
+ */
+
 package _01;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.mock;
@@ -21,12 +34,12 @@ import _01_HelloWorld.ServiceImpl;
 
 @SuppressWarnings({ "unchecked", "deprecation" })
 public class _01_HelloWorld {
-	//For this test ServiceImpl is also called System Under Test(SUT)
+	// For this test ServiceImpl is also called System Under Test(SUT)
 	private ServiceImpl classUnderTest;
-	//For this test IDao is also called collaborator
+	// For this test IDao is also called collaborator
 	private IDao DAOMock;
 
-	// gets called right before the invocation of each test method
+	// called right before the invocation of each test method
 	@Before 
 	public void setup(){		
 		//ARRANGE
@@ -38,52 +51,59 @@ public class _01_HelloWorld {
 	public void question_WhenDAOIsNotAvailable_ThrowDAONotAvailableException() throws InvalidQuestionException, DAONotAvailableException{		
 		// ARRANGE: SETUP MOCK EXPECTATION
 		when(DAOMock.greet()).thenReturn(null); 		
-		//ACT
+		// ACT
 		classUnderTest.question("any question"); 		
-		//ASSERT is done above. Also with this approach, we cannot check if certain methods were called or not after an exception is thrown.
+		// ASSERT is done above. Also with this approach, we cannot check if certain methods were called or not after an exception is thrown.
+		// below should not be reached
+		Assert.fail();
 	}
 	
 	// if you catch the exception, then you can further verify other things.
 	@Test
 	public void question_WhenDAOIsNotAvailable_ThrowDAONotAvailableException2() throws InvalidQuestionException, DAONotAvailableException{
 		// ARRANGE: SETUP MOCK EXPECTATION
-		when(DAOMock.greet()).thenReturn(null); 
-		//ACT
+		when(DAOMock.greet()).thenReturn(null); 		
 		try{
+			// ACT
 			classUnderTest.question("any question");
+			// ASSERT
 			Assert.fail("I should not be reached");
 		} catch(Exception ex){
 			Assert.assertEquals(ex.getClass(), DAONotAvailableException.class);
 		}
-		//ASSERT
-		verify(DAOMock, never()).question(IDao.ANY_NEW_TOPICS);
-		verify(DAOMock, never()).question(IDao.WHAT_IS_TODAYS_TOPIC);
-		verify(DAOMock, never()).getPrice(IDao.TOPIC_MOCKITO);
-		verify(DAOMock, never()).bye();
+		Mockito.verify(DAOMock, Mockito.times(1)).greet();
+		Mockito.verify(DAOMock, Mockito.never()).question(IDao.ANY_NEW_TOPICS);
+		Mockito.verify(DAOMock, Mockito.never()).question(IDao.WHAT_IS_TODAYS_TOPIC);
+		Mockito.verify(DAOMock, Mockito.never()).getPrice(IDao.TOPIC_MOCKITO);
+		Mockito.verify(DAOMock, Mockito.never()).bye();
 	}
 
-	@Test(expected=InvalidQuestionException.class)
 	public void question_WhenInvalidQuestionIsAsked_ThrowInvalidQuestionException() throws InvalidQuestionException, DAONotAvailableException{		
 		// ARRANGE: SETUP MOCK EXPECTATION
 		when(DAOMock.greet()).thenReturn(IDao.HELLO_WORLD); 
-		// can be done in either way shown below
-//		when(DAOMock.question(Mockito.anyString())).thenThrow(new InvalidQuestionException());
-//		when(DAOMock.question("INVALID_QUESTION")).thenThrow(new InvalidQuestionException());
-		// argThat: Allows creating custom argument matchers
-		// The API follows builder pattern where each method returns us an Object of type OngoingStubbing so that we can stub further on the returned 
-		// object thus allowing us to build the expectations fluently.
-		// instead of testing the code against one invalid value, it now tests on a sub-set of values using the ArgumentMatcher. We pass in a 
-		// org.mockito.ArgumentMatcher object to argThat(), so that the argument passed in to DAOMock.question() can be tested against the matcher 
-		// to know whether it is one of the arguments expected by the mock object. If yes, then the next stub action will follow, in our case, the 
-		// method will throw an InvalidQuestionException, if the argument value is not a valid question.
+		// can be done in different ways as shown below
+		// when(DAOMock.question(Mockito.anyString())).thenThrow(new InvalidQuestionException());
+		// when(DAOMock.question("INVALID_QUESTION")).thenThrow(new InvalidQuestionException());
 		when(DAOMock.question((String) argThat(new ArgumentMatcher<Object>() {
 			@Override
 			public boolean matches(Object argument) {
 				return !IDao.ANY_NEW_TOPICS.equals(argument) || !IDao.WHAT_IS_TODAYS_TOPIC.equals(argument);
 			}			
 		}))).thenThrow(new InvalidQuestionException());		
-		//ACT
-		classUnderTest.question("INVALID_QUESTION");
+		try{
+			// ACT
+			classUnderTest.question("INVALID_QUESTION");
+			// ASSERT
+			Assert.fail("I should not be reached");
+		} catch(Exception ex){
+			Assert.assertEquals(ex.getClass(), InvalidQuestionException.class);
+		}
+		Mockito.verify(DAOMock, Mockito.times(1)).greet();
+		Mockito.verify(DAOMock, Mockito.times(1)).question("INVALID_QUESTION");
+		Mockito.verify(DAOMock, Mockito.never()).question(IDao.ANY_NEW_TOPICS);
+		Mockito.verify(DAOMock, Mockito.never()).question(IDao.WHAT_IS_TODAYS_TOPIC);
+		Mockito.verify(DAOMock, Mockito.never()).getPrice(IDao.TOPIC_MOCKITO);
+		Mockito.verify(DAOMock, Mockito.never()).bye();
 	}
 
 	@Test
@@ -91,9 +111,9 @@ public class _01_HelloWorld {
 		// ARRANGE: SETUP MOCK EXPECTATION
 		when(DAOMock.greet()).thenReturn(IDao.HELLO_WORLD); 
 		when(DAOMock.question(IDao.ANY_NEW_TOPICS)).thenReturn(IDao.NO_NEW_TOPIC);		
-		//ACT
+		// ACT
 		String result = classUnderTest.question(IDao.ANY_NEW_TOPICS);				
-		//ASSERT
+		// ASSERT
 		// state verification
 		Assert.assertEquals(result, IDao.NO_NEW_TOPIC); 
 		// behavior verification
@@ -110,9 +130,9 @@ public class _01_HelloWorld {
 		when(DAOMock.question(IDao.ANY_NEW_TOPICS)).thenReturn(IDao.YES_NEW_TOPICS_AVAILABLE);
 		when(DAOMock.question(IDao.WHAT_IS_TODAYS_TOPIC)).thenReturn(IDao.TOPIC_MOCKITO);
 		when(DAOMock.getPrice(IDao.TOPIC_MOCKITO)).thenReturn(99);		
-		//ACT
+		// ACT
 		String result = classUnderTest.question(IDao.ANY_NEW_TOPICS);		
-		//ASSERT
+		// ASSERT
 		Assert.assertEquals(result, "Topic is Mockito, price is 99");
 		verify(DAOMock, times(1)).question(IDao.ANY_NEW_TOPICS);
 		verify(DAOMock, times(1)).question(IDao.WHAT_IS_TODAYS_TOPIC);
@@ -125,7 +145,6 @@ public class _01_HelloWorld {
 	public void question_WhenNewTopicIsAvailable2() throws InvalidQuestionException, DAONotAvailableException{
 		// ARRANGE: SETUP MOCK EXPECTATION
 		when(DAOMock.greet()).thenReturn(IDao.HELLO_WORLD); 		
-		//when it needs to return different values for different arguments, Mockito�s argument matcher is handy 
 		when(DAOMock.question((String) argThat(new ArgumentMatcher<Object>(){
 			@Override
 			public boolean matches(Object argument) {
