@@ -1,4 +1,14 @@
 /*
+ * 
+ * 1. What is mocking?
+Mocking is a testing technique where real components are replaced with objects that have a predefined behavior (mock objects) only for the test/tests that have been created for. In other words, a mock object is an object that is configured to return a specific output for a specific input, without performing any real action.
+1.1. Why should we mock?
+If we start mocking wildly, without understanding why mocking is important and how can it help us, we will probably put on doubt the usefulness of mocking.
+There are several scenarios where we should use mocks:
+When we want to test a component that depends on other component, but which is not yet developed. This happens often when working in team, and component development is divided between several developers. If mocking wouldn’t exist, we would have to wait until the other developer/developers end the required component/component for testing ours.
+When the real component performs slow operations, usual with dealing with database connections or other intense disk read/write operations. It is not weird to face database queries that can take 10, 20 or more seconds in production environments. Forcing our tests to wait that time would be a considerable waste of useful time that can be spent in other important parts of the development.
+When there are infrastructure concerns that would make impossible the testing. This is similar in same way to the first scenario described when, for example, our development connects to a database, but the server where is hosted is not configured or accessible for some reason.
+
 argThat: Allows creating custom argument matchers		
 
 Instead of testing the code against one invalid value, it now tests on a sub-set of values using the ArgumentMatcher. We pass in a 

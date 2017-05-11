@@ -1,14 +1,14 @@
 /*
-There are times when we would like to use most of the original object’s behavior but mock only a portion of it. This is called spying objects, also 
+There are times when we would like to use most of the original objectï¿½s behavior but mock only a portion of it. This is called spying objects, also 
 called as partial mocking.
 
-Using Mockito’s spy feature, we can mock only those methods of a real object that we want to, thus retaining the rest of the original behavior.
+Using Mockitoï¿½s spy feature, we can mock only those methods of a real object that we want to, thus retaining the rest of the original behavior.
 
 We create the spy object using org.mockito.Mockito.spy(real object). In our example, we do it in the @BeforeMethod, buildSpy(). We create the Employee 
 bean and then the spy object using spy(emp).
 Since we have two Employee beans, one the original and the other spy, one question that naturally arises is, whether the spy object refers to the 
 original object internally. Answer is No. Mockito creates a copy of the original object, so when methods are exercised on the spy object, the state of 
-the original object remain unaffected. Likewise, if you interact with the real object, the spy object won’t be aware of those interactions.
+the original object remain unaffected. Likewise, if you interact with the real object, the spy object wonï¿½t be aware of those interactions.
 
 doReturn():
 Use doReturn() in those rare occasions when you cannot use Mockito.when(Object). 
@@ -101,7 +101,7 @@ public class _04_Spy {
 	}
 	
 	// Stubbing a final method in a Spy Object
-	// we can’t train a final method. Method moveTo(), updates employee’s designation. We also have another method, finalMoveTo() which does the same 
+	// we canï¿½t train a final method. Method moveTo(), updates employeeï¿½s designation. We also have another method, finalMoveTo() which does the same 
 	// as moveTo () but is a final method.
 	@Test(expected=RuntimeException.class)
 	public void stubNonFinalMethod(){
@@ -110,7 +110,7 @@ public class _04_Spy {
 		spyEmp.moveTo(dev);
 	}
 	
-	// Since finalMoveTo() is final, Mockito fails to train it and instead simply invokes the real object’s method, which is why it fails to throw 
+	// Since finalMoveTo() is final, Mockito fails to train it and instead simply invokes the real objectï¿½s method, which is why it fails to throw 
 	// RuntimeException.
 	@Test(expected=RuntimeException.class)
 	public void stubFinalMethod(){
@@ -119,7 +119,7 @@ public class _04_Spy {
 		spyEmp.moveTo(dev);
 	}
 	
-	// Suppose we want to train our spy object Employee bean to return us “SPY” when getSkill(0) is called, using when() API like below, will throw 
+	// Suppose we want to train our spy object Employee bean to return us ï¿½SPYï¿½ when getSkill(0) is called, using when() API like below, will throw 
 	// NullPointerException. Note that spyEmp.getSkill(0) calls on the original method and since the List object is not yet initialized, it throws 
 	// NullPointerException.	
 	@Test

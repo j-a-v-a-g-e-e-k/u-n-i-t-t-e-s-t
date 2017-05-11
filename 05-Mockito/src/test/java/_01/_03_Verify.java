@@ -46,8 +46,8 @@ public class _03_Verify {
 			Assert.assertEquals(ex.getClass(), NotEnoughFundsException.class);
 		}
 		//verify behavior by interaction
-		Mockito.verify(mockAccountManager).findAccount(classUnderTest);
-		Mockito.verify(mockAccountManager).getBalance(mockAccount);
+		Mockito.verify(mockAccountManager).findAccount(classUnderTest); //Verifies certain behavior happened once.
+		Mockito.verify(mockAccountManager).getBalance(mockAccount); //Verifies certain behavior happened once.
 		Mockito.verify(mockAccountManager, Mockito.times(0)).withdraw(mockAccount, 300L);
 	}	
 	
